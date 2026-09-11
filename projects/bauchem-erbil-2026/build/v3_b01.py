@@ -15,7 +15,7 @@ CW = W - 2 * M                    # 2500
 BAND_Y, BAND_H = 1348.0, 833.0    # фотополоса 2500 × 833 = ровно 3:1
 
 
-def build(out, image="img/P3_wide.png"):
+def build(out, image="img/H2_wide.png"):
     here = os.path.join(os.path.dirname(__file__), "..")
     c = Canvas(W, H, BL)
     c.rect(-BL, -BL, W + 2 * BL, H + 2 * BL, T.WHITE)
@@ -24,31 +24,37 @@ def build(out, image="img/P3_wide.png"):
     LOGO.place(c, M, 160, 980)
     c.text(T.face(600), "CHEMISTRY. TECHNOLOGY. SUPPLY.", 40, W - M, 322, T.NAVY, 0.20, "end")
     T.hairline(c, M, 470, CW)
-    T.kicker(c, M, 572, "Iraq · Erbil 2026", 36)
+    T.kicker(c, M, 560, "Iraq · Erbil 2026", 36)
 
     # ---------------------------------------------------------- заголовок
     fh = T.face(700)
     lines = ["FROM RAW MATERIALS", "TO PRODUCTION SOLUTIONS"]
     size = min(T.fit_size(fh, s, CW, -0.012) for s in lines)
-    y1 = 790.0
+    y1 = 740.0
     for i, s in enumerate(lines):
         c.text(fh, s, size, M, y1 + i * size, T.NAVY, -0.012)
-    y = y1 + size
+    y = y1 + (len(lines) - 1) * size
 
     # ------------------------------------------------- акцент и подзаголовок
     T.rule_accent(c, M, y + 92, 320, 12)
+    sub_size = 46.0
+    sub_y = y + 200
     c.text(T.face(400), "Concrete admixtures, raw materials and fibers "
-                        "for producers and contractors.", 46, M, y + 200, T.GREY, 0.02)
+                        "for producers and contractors.", sub_size, M, sub_y, T.GREY, 0.02)
 
     # ------------------------------------------------------ строка категорий
-    T.hairline(c, M, 1188, CW)
-    T.divided_row(c, M, 1272, CW,
+    hl1 = T.rule_below(c, M, sub_y, CW, sub_size, gap=50)
+    row_size = 34.0
+    row_y = hl1 + 86
+    T.divided_row(c, M, row_y, CW,
                   ["Concrete admixtures", "Raw materials", "Fibers", "Technology"],
-                  size=34, color=T.GREY, track=0.18, sep_h=42)
-    T.hairline(c, M, 1312, CW)
+                  size=row_size, color=T.GREY, track=0.18, sep_h=44)
+    hl2 = T.rule_below(c, M, row_y, CW, row_size, gap=38)
 
     # --------------------------------------------------------- фотополоса
-    info = T.photo(c, M, BAND_Y, CW, BAND_H, os.path.join(here, image), max_px=3840)
+    band_y = hl2 + 48
+    info = T.photo(c, M, band_y, CW, BAND_H, os.path.join(here, image), max_px=3840)
+    print("низ полосы:", round(band_y + BAND_H, 1), "мм, поле до реза:", round(H - band_y - BAND_H, 1), "мм")
 
     c.save(out, png_px=1400)
     print("фотополоса:", info)

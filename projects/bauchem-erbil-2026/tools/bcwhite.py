@@ -26,6 +26,24 @@ def face(weight=400, width=100):
     return _faces[weight]
 
 
+# вертикальные метрики Archivo (доли кегля) — отступы считаем от них,
+# иначе линейки режут текст
+CAP  = 0.688      # высота прописных
+DESC = 0.212      # свес нижних выносных
+
+def cap_h(size):
+    return size * CAP
+
+def desc_h(size):
+    return size * DESC
+
+def rule_below(c, x, y_baseline, w, size, gap=40.0, **kw):
+    """Линейка под строкой: ниже свеса выносных на gap."""
+    yy = y_baseline + desc_h(size) + gap
+    hairline(c, x, yy, w, **kw)
+    return yy
+
+
 def fit_size(fc, text, target_w, tracking=0.0, guess=100.0):
     w = 0
     for _ in range(6):
