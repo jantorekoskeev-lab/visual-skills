@@ -1,3 +1,6 @@
 out/*_preview.png
 out/_sheet*.png
 out/*.zip
+img/*.png
+out_v3/*_preview.png
+out_v3/*.svg

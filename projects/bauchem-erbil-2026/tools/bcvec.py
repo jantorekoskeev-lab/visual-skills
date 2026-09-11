@@ -263,7 +263,7 @@ class Canvas:
         b = self.bleed
         vb = f"{-b} {-b} {self.w + 2 * b} {self.h + 2 * b}"
         u = "" if self.unit == "px" else "mm"
-        head = (f'<svg xmlns="http://www.w3.org/2000/svg" version="1.1" '
+        head = (f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" '
                 f'width="{self.w + 2 * b}{u}" height="{self.h + 2 * b}{u}" viewBox="{vb}">')
         defs = "<defs>" + "".join(self.defs) + "</defs>"
         return head + defs + "".join(self.body) + "</svg>"

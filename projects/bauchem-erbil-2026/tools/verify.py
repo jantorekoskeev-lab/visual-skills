@@ -18,10 +18,15 @@ def check(path):
             if o.get("/Subtype") == "/Image":
                 imgs.append(k)
     m, t = mm(p.mediabox), mm(p.trimbox)
-    ok = (not fonts) and (not imgs)
+    ok = not fonts                       # шрифтов быть не должно; фото — нормально
+    note = ""
+    if imgs and xo:
+        for k in imgs:
+            o = xo[k].get_object()
+            note += f" фото {o.get('/Width')}×{o.get('/Height')}px"
     print(f"{os.path.basename(path):<12} Media {m[2]-m[0]:>7.1f}×{m[3]-m[1]:<7.1f} "
-          f"Trim {t[2]-t[0]:>7.1f}×{t[3]-t[1]:<7.1f} мм | шрифтов: {len(fonts)} | растра: {len(imgs)} | "
-          f"{'ВЕКТОР OK' if ok else 'ВНИМАНИЕ'}")
+          f"Trim {t[2]-t[0]:>7.1f}×{t[3]-t[1]:<7.1f} мм | шрифтов: {len(fonts)} |"
+          f"{note or ' без растра'} | {'OK' if ok else 'ВНИМАНИЕ: остались шрифты'}")
     return ok
 
 if __name__ == "__main__":
