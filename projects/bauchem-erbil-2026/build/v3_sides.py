@@ -30,7 +30,7 @@ SPECS = {
 RIGHT = {
  "R01": dict(code="R01", kicker="04 · Technology", title=["PRODUCTION", "TECHNOLOGY"],
              image="img/R01_production.png",
-             items=[("PCE & admixture", "production lines"),
+             items=[("PCE Admixtures", "production lines"),
                     ("Bitumen emulsion", "production lines")],
              step=94, item_size=42, cap_size=28),
  "R03": dict(code="R03", kicker="05 · Infrastructure", title=["ASPHALT", "TECHNOLOGIES"],
