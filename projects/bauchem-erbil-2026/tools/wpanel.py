@@ -1,0 +1,68 @@
+# -*- coding: utf-8 -*-
+"""Боковая панель 950 × 2250 мм в белой деловой системе BAUCHEM."""
+import sys, os
+sys.path.insert(0, os.path.dirname(__file__))
+from bcvec import Canvas
+import bcwhite as T
+import logo as LOGO
+
+W, H, BL = 950.0, 2250.0, 5.0
+M = 85.0
+CW = W - 2 * M                 # 780
+SAFE = 1430.0                  # ниже — тумба образцов D01 (панели L02, L03)
+
+# жёсткие горизонтали — три панели стоят рядом и должны совпадать
+RULE_Y = 658.0                 # оранжевый акцент
+PH_Y   = 732.0                 # верх фотоблока
+PH_H   = 350.0                 # высота фотоблока
+LIST_Y = 1166.0                # первая строка списка
+
+
+def render(spec, out, png_px=760):
+    here = os.path.join(os.path.dirname(__file__), "..")
+    c = Canvas(W, H, BL)
+    c.rect(-BL, -BL, W + 2 * BL, H + 2 * BL, T.WHITE)
+
+    # ------------------------------------------------------------- шапка
+    LOGO.place(c, M, 120, 620)
+    T.hairline(c, M, 320, CW)
+    T.kicker(c, M, 398, spec["kicker"], 26, T.GREY, 0.26)
+
+    # ---------------------------------------------------------- заголовок
+    fh = T.face(700)
+    lines = spec["title"]
+    size = min(min(T.fit_size(fh, s, CW, -0.012) for s in lines), 112.0)
+    y1 = 480.0
+    for i, s in enumerate(lines):
+        c.text(fh, s, size, M, y1 + i * size, T.NAVY, -0.012)
+    # ------------------------------------------------------------- акцент
+    T.rule_accent(c, M, RULE_Y, 210, 9)
+
+    # ------------------------------------------------------------- фото
+    info = T.photo(c, M, PH_Y, CW, PH_H, os.path.join(here, spec["image"]), max_px=2700)
+
+    # ------------------------------------------------------------ список
+    ly = LIST_Y
+    items = spec["items"]
+    step = spec.get("step", (SAFE - ly) / len(items))
+    ft, fc = T.face(600), T.face(400)
+    for i, it in enumerate(items):
+        title, cap = (it if isinstance(it, (list, tuple)) else (it, ""))
+        yy = ly + i * step
+        c.text(ft, title, spec.get("item_size", 40), M, yy, T.NAVY, 0.0)
+        if cap:
+            c.text(fc, cap, spec.get("cap_size", 28), M, yy + 42, T.GREY, 0.04)
+        if i < len(items) - 1:
+            T.hairline(c, M, yy + step - (26 if cap else 18), CW)
+
+    if spec.get("footnote"):
+        T.kicker(c, M, SAFE + 62, spec["footnote"], 22, T.GREY_L, 0.24)
+
+    # --------------------------------------------------------------- низ
+    T.hairline(c, M, 2066, CW)
+    c.text(T.face(600), "CHEMISTRY. TECHNOLOGY. SUPPLY.", 27, M, 2138, T.NAVY, 0.18)
+    T.kicker(c, M, 2205, f"{spec['code']} · 950 × 2250 mm", 19, T.GREY_L, 0.20)
+
+    c.save(out, png_px=png_px)
+    print(spec["code"], "фото:", info)
+    return out
