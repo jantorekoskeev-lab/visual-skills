@@ -25,7 +25,31 @@ SPECS = {
              step=94, item_size=42, cap_size=28, footnote="Explore the samples"),
 }
 
+
+
+RIGHT = {
+ "R01": dict(code="R01", kicker="04 · Technology", title=["PRODUCTION", "TECHNOLOGY"],
+             image="img/R01_production.png",
+             items=[("PCE & admixture", "production lines"),
+                    ("Bitumen emulsion", "production lines")],
+             step=94, item_size=42, cap_size=28),
+ "R03": dict(code="R03", kicker="05 · Infrastructure", title=["ASPHALT", "TECHNOLOGIES"],
+             image="img/R03_asphalt.png",
+             items=["Asphalt Additives", "Bitumen Technologies", "Bitumen Emulsion", "Production"],
+             step=52, item_size=38,
+             partner=dict(kicker="In partnership with", name="ROADEX")),
+}
+R02 = dict(code="R02", kicker="Live · Production", title=["PRODUCTION", "IN FOCUS"],
+           caption="Bitumen emulsion and admixture production lines.")
+
+
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
-    for code in (sys.argv[1:] or ["L01", "L02", "L03"]):
-        P.render(SPECS[code], os.path.join(OUT, code))
+    todo = sys.argv[1:] or ["L01", "L02", "L03", "R01", "R02", "R03"]
+    for code in todo:
+        if code == "R02":
+            P.render_screen(R02, os.path.join(OUT, "R02"))
+        elif code in RIGHT:
+            P.render(RIGHT[code], os.path.join(OUT, code))
+        else:
+            P.render(SPECS[code], os.path.join(OUT, code))

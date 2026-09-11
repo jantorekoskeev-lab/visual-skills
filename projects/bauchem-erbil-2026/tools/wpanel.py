@@ -19,6 +19,10 @@ PH_Y    = 790.0                # верх фотоблока
 PH_H    = 320.0                # высота фотоблока
 SECT_Y  = 1150.0               # линейка над списком
 LIST_Y  = 1212.0               # базовая линия первой строки списка
+PART_Y  = 1560.0               # блок партнёра (R03)
+
+# --- R02: телевизор 43" перекрывает полосу 650-1230 мм от верха полотна ---
+TV_TOP, TV_BOT = 650.0, 1230.0
 
 
 def render(spec, out, png_px=760):
@@ -61,6 +65,12 @@ def render(spec, out, png_px=760):
     if spec.get("footnote"):
         T.kicker(c, M, SAFE + 62, spec["footnote"], 22, T.GREY_L, 0.24)
 
+    # ---------------------------------------------------- блок партнёра
+    if spec.get("partner"):
+        T.hairline(c, M, PART_Y, CW)
+        T.kicker(c, M, PART_Y + 60, spec["partner"]["kicker"], 22, T.GREY, 0.26)
+        c.text(T.face(700), spec["partner"]["name"], 62, M, PART_Y + 148, T.NAVY, 0.01)
+
     # --------------------------------------------------------------- низ
     T.hairline(c, M, 2066, CW)
     c.text(T.face(600), "CHEMISTRY. TECHNOLOGY. SUPPLY.", 27, M, 2138, T.NAVY, 0.18)
@@ -68,4 +78,35 @@ def render(spec, out, png_px=760):
 
     c.save(out, png_px=png_px)
     print(spec["code"], "фото:", info)
+    return out
+
+
+def render_screen(spec, out, png_px=760):
+    """R02 — фон за телевизором: печатаем только то, что видно выше и ниже экрана."""
+    c = Canvas(W, H, BL)
+    c.rect(-BL, -BL, W + 2 * BL, H + 2 * BL, T.WHITE)
+
+    LOGO.place(c, M, 120, 620)
+    T.hairline(c, M, 320, CW)
+    T.kicker(c, M, KICK_Y, spec["kicker"], 26, T.GREY, 0.26)
+
+    fh = T.face(700)
+    lines = spec["title"]
+    size = min(min(T.fit_size(fh, s, CW, -0.012) for s in lines), 96.0)
+    title_b = 596.0
+    y1 = title_b - (len(lines) - 1) * size
+    for i, s in enumerate(lines):
+        c.text(fh, s, size, M, y1 + i * size, T.NAVY, -0.012)
+
+    # полоса экрана TV_TOP..TV_BOT остаётся чистой — ничего не печатаем
+
+    T.hairline(c, M, 1320, CW)
+    c.text(T.face(400), spec["caption"], 30, M, 1392, T.GREY, 0.04)
+
+    T.hairline(c, M, 2066, CW)
+    c.text(T.face(600), "CHEMISTRY. TECHNOLOGY. SUPPLY.", 27, M, 2138, T.NAVY, 0.18)
+    T.kicker(c, M, 2205, f"{spec['code']} · 950 × 2250 mm", 19, T.GREY_L, 0.20)
+
+    c.save(out, png_px=png_px)
+    print(spec["code"], "экран закрывает", TV_TOP, "-", TV_BOT, "мм от верха")
     return out
