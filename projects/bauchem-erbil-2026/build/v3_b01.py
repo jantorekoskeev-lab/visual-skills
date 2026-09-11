@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""B01 v3 — задний баннер 2900 × 2300 мм. Стиль WHITE / STRICT."""
+"""
+B01 v3.1 — задний баннер 2900 × 2300 мм.
+Фото во всю площадь (промпт заказчика), типографика в пустом центре.
+"""
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "tools"))
 from bcvec import Canvas
@@ -8,50 +11,48 @@ import logo as LOGO
 
 W, H, BL = 2900.0, 2300.0, 5.0
 M = 200.0
-CW = W - 2 * M                      # 2500
-SAFE = 1500.0                       # ниже — мебель перед задней стеной
-
-# левая колонка / правый фотоблок
-COL_W = 1200.0
-PH_X, PH_Y = 1520.0, 560.0
-PH_W, PH_H = 1180.0, 940.0
+CW = W - 2 * M
+SAFE = 1500.0            # ниже — стол и стулья перед задней стеной
+CX = W / 2
 
 
-def build(out, image="img/C_plant.png"):
+def build(out, image="img/P2_banner.png", panel_op=0.90):
     here = os.path.join(os.path.dirname(__file__), "..")
     c = Canvas(W, H, BL)
     c.rect(-BL, -BL, W + 2 * BL, H + 2 * BL, T.WHITE)
 
-    # ------------------------------------------------------------- шапка
-    LOGO.place(c, M, 185, 980)
-    T.kicker(c, W - M, 352, "Iraq · Erbil 2026", 36, T.GREY, 0.24, anchor="end")
-    T.hairline(c, M, 500, CW)
+    # ------------------------------------------------- фото во всю площадь
+    info = T.photo(c, -BL, -BL, W + 2 * BL, H + 2 * BL,
+                   os.path.join(here, image), max_px=3200)
 
-    # -------------------------------------------------------------- фото
-    info = T.photo(c, PH_X, PH_Y, PH_W, PH_H, os.path.join(here, image))
+    # ----------------------------------------- белая панель под типографику
+    PW, PX = 1880.0, None
+    PY0, PY1 = 420.0, 1370.0
+    PX = CX - PW / 2
+    c.rect(PX, PY0, PW, PY1 - PY0, T.WHITE, panel_op)
+    c.rect(PX, PY0, PW, 8, T.NAVY, 0.9)                 # тонкая фирменная кромка сверху
 
-    # --------------------------------------------------------- заголовок
-    size, last_y = T.headline(c, M, 740,
-                              ["FROM RAW", "MATERIALS", "TO PRODUCTION", "SOLUTIONS"],
-                              COL_W, T.NAVY, weight=700, track=-0.01, leading=1.02,
-                              size_cap=150)
-    y = last_y + 118
-    T.rule_accent(c, M, y, 300, 12)
-    y += 104
-    fb = T.face(400)
-    c.text(fb, "Concrete admixtures, raw materials and fibers", 44, M, y, T.GREY, 0.02)
-    c.text(fb, "for producers and contractors.", 44, M, y + 60, T.GREY, 0.02)
+    # ----------------------------------------------------------- логотип
+    lw = 940.0
+    LOGO.place(c, CX - lw / 2, 545, lw)
 
-    # ------------------------------------------------------ строка тем
-    T.hairline(c, M, 1640, CW)
-    T.divided_row(c, M, 1740, CW,
-                  ["Concrete admixtures", "Raw materials", "Fibers", "Technology"],
-                  size=38, color=T.GREY, track=0.18)
-    T.hairline(c, M, 1800, CW)
+    # ---------------------------------------------------------- заголовок
+    fh = T.face(700)
+    lines = ["FROM RAW MATERIALS", "TO PRODUCTION SOLUTIONS"]
+    size = min(T.fit_size(fh, s, PW - 240, -0.01) for s in lines)
+    y1 = 950.0
+    for i, s in enumerate(lines):
+        c.text(fh, s, size, CX, y1 + i * size * 1.02, T.NAVY, -0.01, "middle")
+    y = y1 + size * 1.02
+
+    # -------------------------------------------------- акцент и подпись
+    T.rule_accent(c, CX - 150, y + 78, 300, 11)
+    c.text(T.face(500), "Concrete admixtures · Raw materials · Fibers · Technology",
+           42, CX, y + 186, T.GREY, 0.06, "middle")
 
     # --------------------------------------------------------------- низ
-    c.text(T.face(600), "CHEMISTRY. TECHNOLOGY. SUPPLY.", 58, M, 2120, T.NAVY, 0.20)
-    T.kicker(c, W - M, 2120, "B01 · 2900 × 2300 mm", 30, T.GREY_L, 0.20, anchor="end")
+    c.text(T.face(600), "CHEMISTRY. TECHNOLOGY. SUPPLY.", 54, M, 2135, T.NAVY, 0.20)
+    T.kicker(c, W - M, 2135, "Iraq · Erbil 2026", 30, T.NAVY, 0.20, anchor="end")
 
     c.save(out, png_px=1400)
     print("фото:", info)
@@ -61,5 +62,6 @@ def build(out, image="img/C_plant.png"):
 if __name__ == "__main__":
     d = os.path.join(os.path.dirname(__file__), "..", "out_v3")
     os.makedirs(d, exist_ok=True)
-    img = sys.argv[1] if len(sys.argv) > 1 else "img/C_plant.png"
-    print(build(os.path.join(d, "B01"), img))
+    img = sys.argv[1] if len(sys.argv) > 1 else "img/P2_banner.png"
+    tag = sys.argv[2] if len(sys.argv) > 2 else "B01"
+    print(build(os.path.join(d, tag), img))
