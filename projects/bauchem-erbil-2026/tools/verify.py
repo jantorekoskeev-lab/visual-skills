@@ -29,7 +29,15 @@ def check(path):
           f"{note or ' без растра'} | {'OK' if ok else 'ВНИМАНИЕ: остались шрифты'}")
     return ok
 
+DEFAULT_DIR = os.path.join(os.path.dirname(__file__), "..", "out_v3")
+
 if __name__ == "__main__":
-    args = sys.argv[1:] or sorted(glob.glob("out/*.pdf"))
-    allok = all(check(a) for a in args)
-    sys.exit(0 if allok else 1)
+    args = sys.argv[1:]
+    if not args:
+        args = sorted(glob.glob(os.path.join(DEFAULT_DIR, "*.pdf")))
+        print(f"проверяю {os.path.normpath(DEFAULT_DIR)} — файлов: {len(args)}\n")
+    if not args:
+        print("нечего проверять"); sys.exit(1)
+    results = [check(a) for a in args]          # без short-circuit: проверяем всё
+    print(f"\nитого: {sum(results)} из {len(results)} без замечаний")
+    sys.exit(0 if all(results) else 1)
