@@ -54,7 +54,7 @@ def tv01():
 
 def tv02():
     c = _frame("TV02")
-    _head(c, "01 · Materials & admixtures", ["RAW MATERIALS", "& ADMIXTURES"], rule=False)
+    _head(c, "01 · Materials and admixtures", ["RAW MATERIALS", "AND ADMIXTURES"], rule=False)
     T.rule_accent(c, M, RULE_Y, 260, 9)
     _band(c, "img/L01_materials.png")
     c.save(os.path.join(OUT, "TV02"), png_px=1920)
