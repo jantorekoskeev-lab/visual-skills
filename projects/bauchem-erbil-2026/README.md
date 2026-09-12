@@ -29,6 +29,15 @@
 | Q01 | 148 × 210 | 3 мм | Карточка A5 с QR на WhatsApp |
 | S01…S06 | 100 × 60 | 3 мм | Карточки образцов |
 
+### Визуализация — 5 видов
+
+`stand_front`, `stand_left`, `stand_right` — геометрические виды: настоящие макеты
+спроецированы на стенд в перспективе. По ним проверяют посадку и перекрытия мебелью.
+
+`photo_front`, `photo_3q` — презентационные виды: тот же стенд, вписанный в снятый
+выставочный зал со светом и тенями. Зал сгенерирован, стенд — нет: на стенах те же
+файлы, что уходят в печать.
+
 ### Экран — 4 кадра
 
 `TV01…TV04`, 1920 × 1080 px, по 12 секунд, цикл 48 секунд.
@@ -82,14 +91,24 @@
 ## Как пересобрать
 
 ```bash
-pip install fonttools uharfbuzz cairosvg pypdf qrcode pillow opencv-python-headless
-python3 tools/lint_copy.py      # проверка текстов
-python3 build/v3_b01.py         # задний баннер
-python3 build/v3_sides.py       # L01-L03, R01-R03
-python3 build/v3_small.py       # стойка и тумба
-python3 build/v3_cards.py       # Q01 и карточки образцов
-python3 build/v3_screen.py      # кадры для экрана
-python3 tools/verify.py         # проверка выходных PDF
+pip install fonttools uharfbuzz cairosvg pypdf qrcode pillow opencv-python-headless numpy
+python3 build/all.py
+```
+
+`build/all.py` делает весь цикл и останавливается на первой же ошибке:
+проверка текстов → все макеты → сжатие растра в PDF → контроль выходных файлов
+(размеры, боксы, отсутствие шрифтов) → чтение обоих QR сканером →
+сводные листы и визуализации → архив.
+
+Отдельные шаги, если нужно собрать только часть:
+
+```bash
+python3 build/v3_b01.py     # задний баннер
+python3 build/v3_sides.py   # L01-L03, R01-R03
+python3 build/v3_small.py   # стойка и тумба
+python3 build/v3_cards.py   # Q01 и карточки образцов
+python3 build/v3_screen.py  # кадры для экрана
+python3 tools/verify.py     # контроль выходных PDF
 ```
 
 Шрифты: Archivo и Manrope (SIL Open Font License), кладутся в `/tmp/fonts`.
